@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Krishna Pippala — Senior DevSecOps Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet"/>
+<style>
+/* ===== ROOT VARIABLES ===== */
+:root {
+  --bg: #080a12;
+  --bg2: #0d1020;
+  --indigo: #6366f1;
+  --pink: #f43f8a;
+  --cyan: #22d3ee;
+  --amber: #fbbf24;
+  --white: #f0f1fa;
+  --muted: #8b8fa8;
+  --glass: rgba(13,16,32,0.7);
+  --glass-border: rgba(99,102,241,0.2);
+  --card: rgba(14,17,30,0.9);
+}
+
+/* ===== RESET ===== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;font-size:16px;}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:linear-gradient(var(--indigo),var(--pink));border-radius:3px;}
+
+/* ===== CURSOR ===== */
+*{cursor:none!important;}
+#cursor-dot{
+  position:fixed;width:8px;height:8px;background:var(--cyan);border-radius:50%;
+  pointer-events:none;z-index:99999;transform:translate(-50%,-50%);
+  transition:width .15s,height .15s,background .15s;
+  box-shadow:0 0 12px var(--cyan),0 0 24px var(--cyan);
+}
+#cursor-ring{
+  position:fixed;width:36px;height:36px;border:1.5px solid rgba(243,63,138,0.6);
+  border-radius:50%;pointer-events:none;z-index:99998;transform:translate(-50%,-50%);
+  transition:all .1s;
+}
+.cursor-hover #cursor-dot{width:14px;height:14px;background:var(--pink);}
+.cursor-hover #cursor-ring{width:52px;height:52px;border-color:var(--indigo);}
+
+/* ===== NOISE OVERLAY ===== */
+body::before{
+  content:'';position:fixed;inset:0;z-index:1;pointer-events:none;
+  opacity:0.035;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat:repeat;background-size:200px 200px;
+}
+
+/* ===== LOADING SCREEN ===== */
+#loader{
+  position:fixed;inset:0;z-index:99990;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:32px;
+  transition:opacity .6s ease,visibility .6s ease;
+}
+#loader.fade-out{opacity:0;visibility:hidden;}
+.loader-initials{
+  font-family:'Syne',sans-serif;font-size:clamp(64px,12vw,96px);font-weight:800;
+  background:linear-gradient(135deg,var(--indigo),var(--pink),var(--cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:pulse-glow 1.5s ease-in-out infinite alternate;letter-spacing:-2px;
+}
+@keyframes pulse-glow{
+  from{filter:drop-shadow(0 0 20px rgba(99,102,241,.4));}
+  to{filter:drop-shadow(0 0 50px rgba(244,63,138,.7));}
+}
+.loader-bar-wrap{
+  width:220px;height:3px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;
+}
+.loader-bar{
+  height:100%;width:0%;border-radius:2px;
+  background:linear-gradient(90deg,var(--indigo),var(--pink),var(--cyan),var(--amber));
+  background-size:300% 100%;
+  animation:bar-fill 2s ease forwards, gradient-shift 1.5s linear infinite;
+}
+@keyframes bar-fill{from{width:0%;}to{width:100%;}}
+@keyframes gradient-shift{0%{background-position:0% 50%;}100%{background-position:300% 50%;}}
+.loader-text{
+  font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;
+}
+
+/* ===== CANVAS ===== */
+#particle-canvas{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+}
+
+/* ===== BODY ===== */
+body{
+  background:var(--bg);color:var(--white);font-family:'DM Sans',sans-serif;
+  overflow-x:hidden;position:relative;
+}
+
+/* ===== NAVBAR ===== */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  padding:0 clamp(24px,5vw,80px);height:70px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(8,10,18,0.6);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--glass-border);
+  transform:translateY(-100%);
+  animation:slide-down .7s .5s cubic-bezier(.22,1,.36,1) forwards;
+}
+@keyframes slide-down{to{transform:translateY(0);}}
+.nav-logo{
+  font-family:'Syne',sans-serif;font-weight:800;font-size:20px;
+  background:linear-gradient(90deg,var(--indigo),var(--cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  letter-spacing:-0.5px;text-decoration:none;
+}
+.nav-links{display:flex;gap:32px;list-style:none;}
+.nav-links a{
+  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;
+  color:var(--muted);text-decoration:none;letter-spacing:1px;text-transform:uppercase;
+  position:relative;transition:color .3s;
+}
+.nav-links a::after{
+  content:'';position:absolute;bottom:-4px;left:0;right:0;height:1.5px;
+  background:linear-gradient(90deg,var(--indigo),var(--pink));
+  transform:scaleX(0);transform-origin:left;transition:transform .3s ease;
+}
+.nav-links a:hover{color:var(--white);}
+.nav-links a:hover::after{transform:scaleX(1);}
+
+/* ===== SECTION WRAPPER ===== */
+section{position:relative;z-index:2;}
+.container{max-width:1180px;margin:0 auto;padding:0 clamp(24px,5vw,80px);}
+
+/* ===== HERO ===== */
+#hero{
+  min-height:100vh;display:flex;align-items:center;padding-top:70px;
+  position:relative;overflow:hidden;
+}
+.hero-glow{
+  position:absolute;top:10%;left:-10%;width:600px;height:600px;
+  background:radial-gradient(circle,rgba(99,102,241,.15) 0%,transparent 70%);
+  animation:float-slow 8s ease-in-out infinite;pointer-events:none;
+}
+.hero-glow2{
+  position:absolute;bottom:0%;right:-5%;width:500px;height:500px;
+  background:radial-gradient(circle,rgba(244,63,138,.1) 0%,transparent 70%);
+  animation:float-slow 10s ease-in-out infinite reverse;pointer-events:none;
+}
+@keyframes float-slow{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-30px) scale(1.05);}}
+.hero-inner{
+  display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;
+  width:100%;padding:80px 0;
+}
+.hero-left{display:flex;flex-direction:column;gap:28px;}
+.availability-tag{
+  display:inline-flex;align-items:center;gap:10px;
+  background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.25);
+  border-radius:100px;padding:8px 18px;width:fit-content;
+  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--cyan);
+  animation:fade-up .8s 2.2s both;
+}
+.avail-dot{
+  width:8px;height:8px;background:var(--cyan);border-radius:50%;
+  box-shadow:0 0 8px var(--cyan);
+  animation:blink 1.4s ease-in-out infinite;
+}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+.hero-name{
+  font-family:'Syne',sans-serif;font-size:clamp(44px,6vw,72px);font-weight:800;
+  line-height:1.05;letter-spacing:-2px;
+  animation:fade-up .8s 2.4s both;
+}
+.hero-name .line1{display:block;color:var(--white);}
+.hero-name .line2{
+  display:block;
+  background:linear-gradient(135deg,var(--indigo) 0%,var(--pink) 50%,var(--cyan) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.hero-role{
+  font-size:clamp(14px,1.5vw,17px);color:var(--muted);font-weight:400;line-height:1.6;
+  animation:fade-up .8s 2.6s both;
+  border-left:2px solid var(--indigo);padding-left:16px;
+}
+.hero-role strong{color:var(--white);font-weight:500;}
+.hero-ctas{display:flex;gap:14px;flex-wrap:wrap;animation:fade-up .8s 2.8s both;}
+.btn-primary{
+  padding:14px 30px;border-radius:8px;font-family:'DM Sans',sans-serif;
+  font-size:14px;font-weight:600;letter-spacing:.5px;text-decoration:none;
+  background:linear-gradient(135deg,var(--indigo),var(--pink));
+  color:#fff;border:none;position:relative;overflow:hidden;
+  transition:transform .2s,box-shadow .2s;
+}
+.btn-primary::after{
+  content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--pink),var(--cyan));
+  opacity:0;transition:opacity .3s;
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(99,102,241,.4);}
+.btn-primary:hover::after{opacity:1;}
+.btn-primary span{position:relative;z-index:1;}
+.btn-outline{
+  padding:14px 30px;border-radius:8px;font-family:'DM Sans',sans-serif;
+  font-size:14px;font-weight:600;letter-spacing:.5px;text-decoration:none;
+  background:transparent;color:var(--white);
+  border:1.5px solid rgba(99,102,241,.5);
+  transition:border-color .3s,box-shadow .3s,transform .2s;
+}
+.btn-outline:hover{border-color:var(--indigo);box-shadow:0 0 20px rgba(99,102,241,.2);transform:translateY(-2px);}
+.hero-stats{
+  display:flex;gap:32px;animation:fade-up .8s 3s both;
+}
+.stat{display:flex;flex-direction:column;gap:2px;}
+.stat-num{
+  font-family:'Syne',sans-serif;font-size:28px;font-weight:800;
+  background:linear-gradient(90deg,var(--amber),var(--pink));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.stat-label{font-size:12px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
+
+/* Hero right: floating tech cards */
+.hero-right{position:relative;height:480px;animation:fade-up .8s 2.6s both;}
+.tech-orbit{
+  position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+}
+.orbit-center{
+  width:160px;height:160px;border-radius:50%;
+  background:linear-gradient(135deg,var(--indigo),var(--pink));
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 60px rgba(99,102,241,.4),0 0 120px rgba(244,63,138,.2);
+  z-index:2;position:relative;
+  animation:rotate-center 20s linear infinite;
+}
+.orbit-center-inner{
+  width:140px;height:140px;border-radius:50%;background:var(--bg2);
+  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;
+}
+.orbit-center-inner span:first-child{
+  font-family:'Syne',sans-serif;font-size:28px;font-weight:800;
+  background:linear-gradient(135deg,var(--indigo),var(--cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.orbit-center-inner span:last-child{font-size:11px;color:var(--muted);letter-spacing:1px;}
+@keyframes rotate-center{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+.orbit-ring{
+  position:absolute;border-radius:50%;border:1px solid;animation:rotate-ring linear infinite;
+}
+.ring1{width:260px;height:260px;border-color:rgba(99,102,241,.2);animation-duration:15s;}
+.ring2{width:380px;height:380px;border-color:rgba(244,63,138,.15);animation-duration:25s;animation-direction:reverse;}
+.ring3{width:460px;height:460px;border-color:rgba(34,211,238,.1);animation-duration:35s;}
+@keyframes rotate-ring{to{transform:rotate(360deg);}}
+
+.orbit-icon{
+  position:absolute;width:44px;height:44px;border-radius:10px;
+  background:var(--glass);border:1px solid var(--glass-border);
+  backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;
+  font-size:20px;box-shadow:0 4px 20px rgba(0,0,0,.4);
+  transition:transform .3s;
+}
+.orbit-icon:hover{transform:scale(1.15);}
+/* positions on ring1 */
+.ri-1{top:8px;left:50%;transform:translateX(-50%);}
+.ri-2{bottom:8px;left:50%;transform:translateX(-50%);}
+.ri-3{left:8px;top:50%;transform:translateY(-50%);}
+.ri-4{right:8px;top:50%;transform:translateY(-50%);}
+/* positions on ring2 */
+.ri-5{top:22px;left:50%;transform:translateX(-50%);}
+.ri-6{bottom:22px;left:50%;transform:translateX(-50%);}
+.ri-7{left:22px;top:50%;transform:translateY(-50%);}
+.ri-8{right:22px;top:50%;transform:translateY(-50%);}
+.ri-9{top:60px;right:30px;}
+.ri-10{bottom:60px;left:30px;}
+
+@keyframes fade-up{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+
+/* ===== SECTION HEADER ===== */
+.section-header{text-align:center;margin-bottom:64px;}
+.section-tag{
+  display:inline-block;font-size:12px;font-weight:600;letter-spacing:3px;text-transform:uppercase;
+  color:var(--indigo);margin-bottom:14px;
+}
+.section-title{
+  font-family:'Syne',sans-serif;font-size:clamp(32px,5vw,52px);font-weight:800;
+  line-height:1.1;letter-spacing:-1.5px;color:var(--white);
+}
+.section-title .accent{
+  background:linear-gradient(90deg,var(--pink),var(--amber));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.section-divider{
+  width:60px;height:3px;border-radius:2px;margin:20px auto 0;
+  background:linear-gradient(90deg,var(--indigo),var(--pink));
+}
+
+/* ===== ABOUT ===== */
+#about{padding:120px 0;}
+.about-grid{display:grid;grid-template-columns:1fr 1.4fr;gap:60px;align-items:start;}
+.about-text p{font-size:16px;color:var(--muted);line-height:1.8;margin-bottom:16px;}
+.about-text p strong{color:var(--white);font-weight:500;}
+.about-highlights{
+  display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:24px;
+}
+.highlight-item{
+  display:flex;align-items:center;gap:10px;
+  background:rgba(99,102,241,.06);border:1px solid rgba(99,102,241,.15);
+  border-radius:8px;padding:12px 16px;font-size:13px;font-weight:500;color:var(--white);
+  transition:border-color .3s,background .3s;
+}
+.highlight-item:hover{border-color:var(--indigo);background:rgba(99,102,241,.12);}
+.hi-dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);flex-shrink:0;}
+
+.about-cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:700px){.about-cards{grid-template-columns:1fr;}}
+.about-card{
+  background:var(--card);border:1px solid var(--glass-border);border-radius:16px;
+  padding:24px;position:relative;overflow:hidden;
+  transition:border-color .3s,transform .3s;
+}
+.about-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--indigo),var(--pink));
+  transform:scaleX(0);transform-origin:left;transition:transform .4s;
+}
+.about-card:hover{border-color:rgba(99,102,241,.4);transform:translateY(-4px);}
+.about-card:hover::before{transform:scaleX(1);}
+.about-card-icon{font-size:28px;margin-bottom:10px;}
+.about-card h4{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:6px;}
+.about-card p{font-size:13px;color:var(--muted);line-height:1.6;}
+
+/* ===== SKILLS ===== */
+#skills{padding:120px 0;background:linear-gradient(180deg,transparent,rgba(99,102,241,.04),transparent);}
+.skills-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;}
+.skill-category{
+  background:var(--card);border:1px solid var(--glass-border);border-radius:16px;
+  padding:28px;transition:border-color .3s,transform .3s;
+}
+.skill-category:hover{border-color:rgba(99,102,241,.35);transform:translateY(-4px);}
+.skill-cat-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+.skill-cat-icon{
+  width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;
+}
+.skill-cat-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;}
+.skill-tags{display:flex;flex-wrap:wrap;gap:8px;}
+.skill-tag{
+  font-size:12px;font-weight:500;padding:5px 12px;border-radius:100px;
+  border:1px solid;transition:all .25s;letter-spacing:.3px;
+}
+.c-indigo .skill-cat-icon{background:rgba(99,102,241,.12);}
+.c-indigo .skill-tag{color:var(--indigo);border-color:rgba(99,102,241,.3);background:rgba(99,102,241,.06);}
+.c-indigo .skill-tag:hover{background:rgba(99,102,241,.2);border-color:var(--indigo);}
+.c-pink .skill-cat-icon{background:rgba(244,63,138,.12);}
+.c-pink .skill-tag{color:var(--pink);border-color:rgba(244,63,138,.3);background:rgba(244,63,138,.06);}
+.c-pink .skill-tag:hover{background:rgba(244,63,138,.2);border-color:var(--pink);}
+.c-cyan .skill-cat-icon{background:rgba(34,211,238,.12);}
+.c-cyan .skill-tag{color:var(--cyan);border-color:rgba(34,211,238,.3);background:rgba(34,211,238,.06);}
+.c-cyan .skill-tag:hover{background:rgba(34,211,238,.2);border-color:var(--cyan);}
+.c-amber .skill-cat-icon{background:rgba(251,191,36,.12);}
+.c-amber .skill-tag{color:var(--amber);border-color:rgba(251,191,36,.3);background:rgba(251,191,36,.06);}
+.c-amber .skill-tag:hover{background:rgba(251,191,36,.2);border-color:var(--amber);}
+
+/* ===== EXPERIENCE ===== */
+#experience{padding:120px 0;}
+.timeline{position:relative;padding-left:30px;}
+.timeline::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:1.5px;
+  background:linear-gradient(180deg,var(--indigo),var(--pink),var(--cyan),transparent);
+}
+.timeline-item{
+  position:relative;margin-bottom:56px;
+  animation:fade-up .6s both;
+}
+.timeline-item:last-child{margin-bottom:0;}
+.timeline-dot{
+  position:absolute;left:-38px;top:6px;width:16px;height:16px;border-radius:50%;
+  background:linear-gradient(135deg,var(--indigo),var(--pink));
+  box-shadow:0 0 0 4px rgba(99,102,241,.2),0 0 12px rgba(99,102,241,.4);
+  z-index:1;
+}
+.timeline-card{
+  background:var(--card);border:1px solid var(--glass-border);border-radius:16px;padding:28px 32px;
+  transition:border-color .3s,transform .3s,box-shadow .3s;
+}
+.timeline-card:hover{
+  border-color:rgba(99,102,241,.35);transform:translateX(6px);
+  box-shadow:-4px 0 30px rgba(99,102,241,.1);
+}
+.timeline-header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:6px;}
+.timeline-role{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--white);}
+.timeline-date{
+  font-size:12px;font-weight:500;letter-spacing:1px;color:var(--amber);
+  background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);
+  padding:4px 12px;border-radius:100px;white-space:nowrap;
+}
+.timeline-company{
+  font-size:14px;font-weight:600;color:var(--indigo);margin-bottom:4px;
+}
+.timeline-location{font-size:13px;color:var(--muted);margin-bottom:16px;}
+.timeline-points{list-style:none;display:flex;flex-direction:column;gap:9px;}
+.timeline-points li{
+  font-size:14px;color:var(--muted);line-height:1.65;padding-left:18px;position:relative;
+}
+.timeline-points li::before{
+  content:'▹';position:absolute;left:0;color:var(--cyan);font-size:12px;top:2px;
+}
+
+/* ===== CERTIFICATIONS ===== */
+#certifications{padding:120px 0;background:linear-gradient(180deg,transparent,rgba(244,63,138,.04),transparent);}
+.certs-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;}
+.cert-card{
+  background:var(--card);border:1px solid var(--glass-border);border-radius:16px;
+  padding:32px;text-align:center;position:relative;overflow:hidden;
+  transition:transform .3s,border-color .3s,box-shadow .3s;
+}
+.cert-card::before{
+  content:'';position:absolute;inset:0;border-radius:16px;
+  background:linear-gradient(135deg,rgba(99,102,241,.05),rgba(244,63,138,.05));
+  opacity:0;transition:opacity .3s;
+}
+.cert-card:hover{transform:translateY(-8px);border-color:rgba(244,63,138,.35);box-shadow:0 20px 60px rgba(244,63,138,.1);}
+.cert-card:hover::before{opacity:1;}
+.cert-icon{font-size:48px;margin-bottom:16px;display:block;}
+.cert-name{
+  font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:8px;
+  background:linear-gradient(135deg,var(--white),var(--muted));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.cert-issuer{font-size:13px;color:var(--cyan);font-weight:500;letter-spacing:.5px;}
+
+/* ===== EDUCATION ===== */
+#education{padding:120px 0;}
+.edu-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+.edu-card{
+  background:var(--card);border:1px solid var(--glass-border);border-radius:16px;
+  padding:32px;position:relative;overflow:hidden;
+  transition:transform .3s,border-color .3s;
+}
+.edu-card:hover{transform:translateY(-6px);border-color:rgba(34,211,238,.35);}
+.edu-card::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--cyan),var(--indigo));
+}
+.edu-degree{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:6px;}
+.edu-school{font-size:15px;font-weight:500;color:var(--indigo);margin-bottom:4px;}
+.edu-meta{font-size:13px;color:var(--muted);margin-bottom:8px;}
+.edu-gpa{
+  display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;
+  color:var(--amber);background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);
+  padding:4px 12px;border-radius:100px;
+}
+
+/* ===== CONTACT ===== */
+#contact{padding:120px 0 80px;}
+.contact-inner{
+  max-width:700px;margin:0 auto;text-align:center;
+}
+.contact-tagline{
+  font-size:18px;color:var(--muted);line-height:1.7;margin-bottom:48px;
+}
+.contact-links{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;}
+.contact-link{
+  display:flex;align-items:center;gap:10px;padding:16px 28px;border-radius:12px;
+  text-decoration:none;font-weight:600;font-size:15px;
+  border:1.5px solid;transition:all .3s;
+}
+.cl-email{color:var(--indigo);border-color:rgba(99,102,241,.3);}
+.cl-email:hover{background:rgba(99,102,241,.1);border-color:var(--indigo);transform:translateY(-3px);}
+.cl-phone{color:var(--pink);border-color:rgba(244,63,138,.3);}
+.cl-phone:hover{background:rgba(244,63,138,.1);border-color:var(--pink);transform:translateY(-3px);}
+.cl-linkedin{color:var(--cyan);border-color:rgba(34,211,238,.3);}
+.cl-linkedin:hover{background:rgba(34,211,238,.1);border-color:var(--cyan);transform:translateY(-3px);}
+.cl-github{color:var(--amber);border-color:rgba(251,191,36,.3);}
+.cl-github:hover{background:rgba(251,191,36,.1);border-color:var(--amber);transform:translateY(-3px);}
+
+/* ===== FOOTER ===== */
+footer{
+  text-align:center;padding:32px;
+  border-top:1px solid var(--glass-border);
+  font-size:13px;color:var(--muted);position:relative;z-index:2;
+}
+footer span{
+  background:linear-gradient(90deg,var(--indigo),var(--pink));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  font-weight:600;
+}
+
+/* ===== SCROLL REVEAL ===== */
+.reveal{opacity:0;transform:translateY(40px);transition:opacity .7s ease,transform .7s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+
+/* ===== EXPERTISE DEEP DIVE ===== */
+#expertise{padding:120px 0;background:linear-gradient(180deg,transparent,rgba(34,211,238,.03),transparent);}
+.expertise-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:24px;}
+.exp-card{
+  background:var(--card);border:1px solid var(--glass-border);border-radius:20px;
+  padding:32px;position:relative;overflow:hidden;
+  transition:transform .3s,border-color .3s,box-shadow .3s;
+}
+.exp-card:hover{transform:translateY(-6px);}
+.exp-card-glow{
+  position:absolute;top:-60px;right:-60px;width:180px;height:180px;border-radius:50%;
+  opacity:.07;pointer-events:none;
+}
+.exp-card-header{display:flex;align-items:center;gap:14px;margin-bottom:16px;}
+.exp-card-num{
+  font-family:'Syne',sans-serif;font-size:11px;font-weight:800;letter-spacing:2px;
+  padding:4px 10px;border-radius:6px;border:1px solid;
+}
+.exp-card-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;}
+.exp-card-desc{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:18px;}
+.exp-card-pills{display:flex;flex-wrap:wrap;gap:7px;}
+.exp-pill{
+  font-size:11px;font-weight:600;padding:4px 10px;border-radius:6px;letter-spacing:.4px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--muted);
+  transition:all .2s;
+}
+.exp-pill:hover{background:rgba(255,255,255,.09);color:var(--white);}
+
+/* color variants */
+.exp-indigo{border-color:rgba(99,102,241,.3);}
+.exp-indigo:hover{border-color:rgba(99,102,241,.6);box-shadow:0 20px 60px rgba(99,102,241,.1);}
+.exp-indigo .exp-card-glow{background:var(--indigo);}
+.exp-indigo .exp-card-num{color:var(--indigo);border-color:rgba(99,102,241,.4);background:rgba(99,102,241,.08);}
+.exp-indigo .exp-pill:hover{color:var(--indigo);}
+
+.exp-pink{border-color:rgba(244,63,138,.3);}
+.exp-pink:hover{border-color:rgba(244,63,138,.6);box-shadow:0 20px 60px rgba(244,63,138,.1);}
+.exp-pink .exp-card-glow{background:var(--pink);}
+.exp-pink .exp-card-num{color:var(--pink);border-color:rgba(244,63,138,.4);background:rgba(244,63,138,.08);}
+.exp-pink .exp-pill:hover{color:var(--pink);}
+
+.exp-cyan{border-color:rgba(34,211,238,.3);}
+.exp-cyan:hover{border-color:rgba(34,211,238,.6);box-shadow:0 20px 60px rgba(34,211,238,.1);}
+.exp-cyan .exp-card-glow{background:var(--cyan);}
+.exp-cyan .exp-card-num{color:var(--cyan);border-color:rgba(34,211,238,.4);background:rgba(34,211,238,.08);}
+.exp-cyan .exp-pill:hover{color:var(--cyan);}
+
+.exp-amber{border-color:rgba(251,191,36,.3);}
+.exp-amber:hover{border-color:rgba(251,191,36,.6);box-shadow:0 20px 60px rgba(251,191,36,.1);}
+.exp-amber .exp-card-glow{background:var(--amber);}
+.exp-amber .exp-card-num{color:var(--amber);border-color:rgba(251,191,36,.4);background:rgba(251,191,36,.08);}
+.exp-amber .exp-pill:hover{color:var(--amber);}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:900px){
+  .hero-inner{grid-template-columns:1fr;gap:40px;}
+  .hero-right{height:300px;}
+  .ring3{width:280px;height:280px;}
+  .ring2{width:220px;height:220px;}
+  .ring1{width:160px;height:160px;}
+  .orbit-center{width:100px;height:100px;}
+  .orbit-center-inner{width:86px;height:86px;}
+  .orbit-center-inner span:first-child{font-size:18px;}
+  .about-grid{grid-template-columns:1fr;}
+  .edu-grid{grid-template-columns:1fr;}
+}
+@media(max-width:640px){
+  .nav-links{display:none;}
+  .hero-stats{gap:20px;}
+}
+</style>
+</head>
+<body>
+
+<!-- Custom Cursor -->
+<div id="cursor-dot"></div>
+<div id="cursor-ring"></div>
+
+<!-- Loading Screen -->
+<div id="loader">
+  <div class="loader-initials">KP</div>
+  <div class="loader-bar-wrap"><div class="loader-bar"></div></div>
+  <div class="loader-text">Loading Portfolio</div>
+</div>
+
+<!-- Particle Canvas -->
+<canvas id="particle-canvas"></canvas>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <a href="#hero" class="nav-logo">Krishna Pippala</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#certifications">Certs</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+  <div class="container">
+    <div class="hero-inner">
+      <div class="hero-left">
+        <div class="availability-tag">
+          <span class="avail-dot"></span>
+          Open to Senior DevSecOps Opportunities
+        </div>
+        <h1 class="hero-name">
+          <span class="line1">Krishna</span>
+          <span class="line2">Pippala</span>
+        </h1>
+        <p class="hero-role">
+          <strong>Senior DevSecOps &amp; Cloud Security Engineer</strong><br/>
+          11+ years securing cloud-native infrastructure across AWS, Azure &amp; GCP — architecting DevSecOps pipelines, hardening Kubernetes at runtime, and integrating AI-driven security automation at scale.
+        </p>
+        <div class="hero-ctas">
+          <a href="#experience" class="btn-primary"><span>View Experience</span></a>
+          <a href="#contact" class="btn-outline">Get in Touch</a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat">
+            <span class="stat-num">11+</span>
+            <span class="stat-label">Years Exp</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num">5+</span>
+            <span class="stat-label">Companies</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num">3</span>
+            <span class="stat-label">Certifications</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num">AWS</span>
+            <span class="stat-label">+ Azure + GCP</span>
+          </div>
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="tech-orbit">
+          <div class="orbit-ring ring1"></div>
+          <div class="orbit-ring ring2"></div>
+          <div class="orbit-ring ring3"></div>
+          <div class="orbit-center">
+            <div class="orbit-center-inner">
+              <span>KP</span>
+              <span>DevSecOps</span>
+            </div>
+          </div>
+          <!-- ring 1 icons -->
+          <div class="orbit-icon ri-1" style="top:-130px;left:50%;transform:translateX(-50%);" title="AWS">☁️</div>
+          <div class="orbit-icon ri-2" style="bottom:-130px;left:50%;transform:translateX(-50%);" title="Docker">🐳</div>
+          <div class="orbit-icon ri-3" style="left:-130px;top:50%;transform:translateY(-50%);" title="Kubernetes">⚙️</div>
+          <div class="orbit-icon ri-4" style="right:-130px;top:50%;transform:translateY(-50%);" title="Security">🔒</div>
+          <!-- ring 2 icons -->
+          <div class="orbit-icon" style="position:absolute;top:-190px;left:50%;transform:translateX(-50%);" title="Terraform">🏗️</div>
+          <div class="orbit-icon" style="position:absolute;bottom:-190px;left:50%;transform:translateX(-50%);" title="Jenkins">🔧</div>
+          <div class="orbit-icon" style="position:absolute;top:30px;left:-210px;" title="Python">🐍</div>
+          <div class="orbit-icon" style="position:absolute;top:30px;right:-210px;" title="Grafana">📊</div>
+          <div class="orbit-icon" style="position:absolute;bottom:30px;left:-170px;" title="GitLab">🦊</div>
+          <div class="orbit-icon" style="position:absolute;bottom:30px;right:-170px;" title="Splunk">🔍</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="container">
+    <div class="section-header reveal">
+      <p class="section-tag">01 — About Me</p>
+      <h2 class="section-title">The Engineer <span class="accent">Behind the Code</span></h2>
+      <div class="section-divider"></div>
+    </div>
+    <div class="about-grid reveal">
+      <div class="about-text">
+        <p>I'm a <strong>Senior DevSecOps and Cloud Security Engineer</strong> with over <strong>11 years of experience</strong> bridging the gap between development speed and security rigor across AWS and Azure platforms.</p>
+        <p>Currently working as a <strong>Senior Cloud Security Architect</strong>, designing and securing cloud-native systems — integrating best-of-breed security tooling into CI/CD pipelines, hardening Kubernetes clusters at runtime, and building AI-driven dashboards that give engineering and business teams real-time vulnerability visibility.</p>
+        <p>Hands-on experience delivering cloud infrastructure across <strong>AWS, Azure, and GCP</strong> — including federal-grade projects with elevated compliance and security requirements. Also driving the intersection of <strong>DevOps with MLOps</strong> and deploying <strong>AI agent frameworks</strong> into production pipelines.</p>
+        <p>My philosophy: <strong>security should enable, not block.</strong> Every gate I build, every scan I automate, and every policy I enforce is designed to shift security left without slowing teams down.</p>
+        <div class="about-highlights">
+          <div class="highlight-item"><span class="hi-dot"></span>AWS Certified Developer</div>
+          <div class="highlight-item"><span class="hi-dot"></span>GCP Cloud Certified</div>
+          <div class="highlight-item"><span class="hi-dot"></span>CompTIA Security+</div>
+          <div class="highlight-item"><span class="hi-dot"></span>Federal Project Experience</div>
+          <div class="highlight-item"><span class="hi-dot"></span>MLOps &amp; AI Agents</div>
+          <div class="highlight-item"><span class="hi-dot"></span>Phoenix, AZ Based</div>
+          <div class="highlight-item"><span class="hi-dot"></span>Scrum / Kanban</div>
+          <div class="highlight-item"><span class="hi-dot"></span>M.S. Comp. Info. Systems</div>
+        </div>
+      </div>
+      <div class="about-cards">
+        <div class="about-card">
+          <div class="about-card-icon">🛡️</div>
+          <h4>Cloud Security Architecture</h4>
+          <p>Designing multi-account AWS, Azure &amp; GCP infrastructures with zero-trust networking, IAM least-privilege, and automated compliance enforcement using Terraform Sentinel — including federal-grade deployments.</p>
+        </div>
+        <div class="about-card">
+          <div class="about-card-icon">🔄</div>
+          <h4>DevSecOps Pipeline Integration</h4>
+          <p>Embedding SAST, DAST, SCA, and container security scanning directly into CI/CD pipelines — Jenkins, GitLab CI, Azure DevOps — with policy-based blocking gates and shared library standardization.</p>
+        </div>
+        <div class="about-card">
+          <div class="about-card-icon">☸️</div>
+          <h4>Kubernetes Security &amp; Runtime Scanning</h4>
+          <p>Runtime threat detection with Sysdig Secure — detecting shell access, privilege escalation, and file tampering live. RBAC hardening, OPA/Gatekeeper, Kyverno policies, and CIS benchmark compliance across EKS, AKS, GKE.</p>
+        </div>
+        <div class="about-card">
+          <div class="about-card-icon">📊</div>
+          <h4>Observability &amp; AI Security Dashboards</h4>
+          <p>Building real-time observability dashboards with Prometheus, Grafana, and Datadog. Designed an AI-driven AppSec dashboard consolidating multi-tool scan results — ZAP, 42Crunch, BlackDuck, Xray, NowSecure — for engineering and business stakeholders.</p>
+        </div>
+        <div class="about-card">
+          <div class="about-card-icon">🤖</div>
+          <h4>DevOps with MLOps &amp; AI Agents</h4>
+          <p>Extending DevOps pipelines into MLOps workflows — automating model training, validation, and deployment. Implementing AI agent frameworks for intelligent pipeline orchestration, automated remediation, and context-aware security response.</p>
+        </div>
+        <div class="about-card">
+          <div class="about-card-icon">🏛️</div>
+          <h4>Application Security (AppSec)</h4>
+          <p>End-to-end AppSec coverage: mobile security via NowSecure, API security via 42Crunch, DAST via OWASP ZAP, firmware analysis via NetRise, and SCA via BlackDuck, Sonatype, and JFrog — all automated into developer workflows.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="container">
+    <div class="section-header reveal">
+      <p class="section-tag">02 — Skills & Tools</p>
+      <h2 class="section-title">My <span class="accent">Tech Arsenal</span></h2>
+      <div class="section-divider"></div>
+    </div>
+    <div class="skills-grid reveal">
+      <div class="skill-category c-indigo">
+        <div class="skill-cat-header">
+          <div class="skill-cat-icon">☁️</div>
+          <span class="skill-cat-title">Cloud Platforms</span>
+        </div>
+        <div class="skill-tags">
+          <span class="skill-tag">AWS</span>
+          <span class="skill-tag">Azure</span>
+          <span class="skill-tag">GCP</span>
+          <span class="skill-tag">IBM Cloud</span>
+          <span class="skill-tag">EKS</span>
+          <span class="skill-tag">AKS</span>
+          <span class="skill-tag">GKE</span>
+        </div>
+      </div>
+      <div class="skill-category c-pink">
+        <div class="skill-cat-header">
+          <div class="skill-cat-icon">🛡️</div>
+          <span class="skill-cat-title">Security Tools</span>
+        </div>
+        <div class="skill-tags">
+          <span class="skill-tag">Sysdig</span>
+          <span class="skill-tag">42Crunch</span>
+          <span class="skill-tag">NowSecure</span>
+          <span class="skill-tag">BlackDuck</span>
+          <span class="skill-tag">SonarQube</span>
+          <span class="skill-tag">Fortify</span>
+          <span class="skill-tag">OWASP ZAP</span>
+          <span class="skill-tag">JFrog Xray</span>
+          <span class="skill-tag">Sonatype</span>
+          <span class="skill-tag">Crowdstrike</span>
+          <span class="skill-tag">Nessus</span>
+          <span class="skill-tag">Frogbot</span>
+        </div>
+      </div>
+      <div class="skill-category c-cyan">
+        <div class="skill-cat-header">
+          <div class="skill-cat-icon">🔄</div>
+          <span class="skill-cat-title">CI/CD & DevOps</span>
+        </div>
+        <div class="skill-tags">
+          <span class="skill-tag">Jenkins</span>
+          <span class="skill-tag">GitLab CI</span>
+          <span class="skill-tag">Azure DevOps</span>
+          <span class="skill-tag">TeamCity</span>
+          <span class="skill-tag">Argo CD</span>
+          <span class="skill-tag">Terraform</span>
+          <span class="skill-tag">Ansible</span>
+          <span class="skill-tag">Chef</span>
+          <span class="skill-tag">Puppet</span>
+          <span class="skill-tag">Helm</span>
+        </div>
+      </div>
+      <div class="skill-category c-amber">
+        <div class="skill-cat-header">
+          <div class="skill-cat-icon">📊</div>
+          <span class="skill-cat-title">Monitoring & Observability</span>
+        </div>
+        <div class="skill-tags">
+          <span class="skill-tag">Splunk</span>
+          <span class="skill-tag">Prometheus</span>
+          <span class="skill-tag">Grafana</span>
+          <span class="skill-tag">Datadog</span>
+          <span class="skill-tag">CloudWatch</span>
+          <span class="skill-tag">Dynatrace</span>
+          <span class="skill-tag">AppDynamics</span>
+          <span class="skill-tag">Nagios</span>
+        </div>
+      </div>
+      <div class="skill-category c-indigo">
+        <div class="skill-cat-header">
+          <div class="skill-cat-icon">💻</div>
+          <span class="skill-cat-title">Programming</span>
+        </div>
+        <div class="skill-tags">
+          <span class="skill-tag">Python</span>
+          <span class="skill-tag">Bash</span>
+          <span class="skill-tag">PowerShell</span>
+          <span class="skill-tag">Golang</span>
+          <span class="skill-tag">Ruby</span>
+          <span class="skill-tag">SQL</span>
+          <span class="skill-tag">C++</span>
+          <span class="skill-tag">Groovy</span>
+          <span class="skill-tag">YAML</span>
+        </div>
+      </div>
+      <div class="skill-category c-cyan">
+        <div class="skill-cat-header">
+          <div class="skill-cat-icon">☸️</div>
+          <span class="skill-cat-title">Containers & Kubernetes</span>
+        </div>
+        <div class="skill-tags">
+          <span class="skill-tag">Docker</span>
+          <span class="skill-tag">Kubernetes</span>
+          <span class="skill-tag">OpenShift</span>
+          <span class="skill-tag">OPA/Gatekeeper</span>
+          <span class="skill-tag">Kyverno</span>
+          <span class="skill-tag">RBAC</span>
+          <span class="skill-tag">Network Policies</span>
+          <span class="skill-tag">Pod Security</span>
+          <span class="skill-tag">Sysdig Runtime</span>
+          <span class="skill-tag">CIS Benchmarks</span>
+        </div>
+      </div>
+      <div class="skill-category c-pink">
+        <div class="skill-cat-header">
+          <div class="skill-cat-icon">🤖</div>
+          <span class="skill-cat-title">AI / MLOps & Agents</span>
+        </div>
+        <div class="skill-tags">
+          <span class="skill-tag">MLOps Pipelines</span>
+          <span class="skill-tag">AI Agent Frameworks</span>
+          <span class="skill-tag">LLM Integration</span>
+          <span class="skill-tag">Model CI/CD</span>
+          <span class="skill-tag">AI Security Dashboards</span>
+          <span class="skill-tag">Automated Remediation</span>
+          <span class="skill-tag">SageMaker</span>
+          <span class="skill-tag">Vertex AI</span>
+        </div>
+      </div>
+      <div class="skill-category c-amber">
+        <div class="skill-cat-header">
+          <div class="skill-cat-icon">🏛️</div>
+          <span class="skill-cat-title">AppSec & Compliance</span>
+        </div>
+        <div class="skill-tags">
+          <span class="skill-tag">OWASP ZAP (DAST)</span>
+          <span class="skill-tag">42Crunch (API Sec)</span>
+          <span class="skill-tag">NowSecure (Mobile)</span>
+          <span class="skill-tag">NetRise (Firmware)</span>
+          <span class="skill-tag">Sonatype (SCA)</span>
+          <span class="skill-tag">Federal Compliance</span>
+          <span class="skill-tag">FedRAMP Concepts</span>
+          <span class="skill-tag">CIS L1/L2</span>
+          <span class="skill-tag">NIST Frameworks</span>
+        </div>
+      </div>
+  </div>
+</section>
+
+<!-- EXPERTISE DEEP DIVE -->
+<section id="expertise">
+  <div class="container">
+    <div class="section-header reveal">
+      <p class="section-tag">03 — Core Expertise</p>
+      <h2 class="section-title">Deep <span class="accent">Specializations</span></h2>
+      <div class="section-divider"></div>
+    </div>
+    <div class="expertise-grid reveal">
+
+      <div class="exp-card exp-indigo">
+        <div class="exp-card-glow"></div>
+        <div class="exp-card-header">
+          <span class="exp-card-num">01</span>
+          <span class="exp-card-title">Kubernetes Security &amp; Runtime Scanning</span>
+        </div>
+        <p class="exp-card-desc">End-to-end Kubernetes security hardening — from admission control to live runtime threat detection. Deployed Sysdig Secure across EKS, AKS, and GKE clusters to detect privilege escalation, shell spawns, container drift, and sensitive file access in real time. Enforced cluster posture via RBAC, Network Policies, Pod Security Standards, OPA/Gatekeeper, and Kyverno — validated against CIS Kubernetes Benchmarks.</p>
+        <div class="exp-card-pills">
+          <span class="exp-pill">Sysdig Secure</span><span class="exp-pill">Runtime Threat Detection</span><span class="exp-pill">OPA/Gatekeeper</span><span class="exp-pill">Kyverno</span><span class="exp-pill">RBAC Hardening</span><span class="exp-pill">Pod Security Standards</span><span class="exp-pill">CIS K8s Benchmarks</span><span class="exp-pill">EKS / AKS / GKE</span>
+        </div>
+      </div>
+
+      <div class="exp-card exp-pink">
+        <div class="exp-card-glow"></div>
+        <div class="exp-card-header">
+          <span class="exp-card-num">02</span>
+          <span class="exp-card-title">Application Security (AppSec)</span>
+        </div>
+        <p class="exp-card-desc">Full-spectrum application security integrated directly into developer workflows. Automated DAST via custom OWASP ZAP containers, API security scanning via 42Crunch, mobile app security via NowSecure, firmware supply-chain analysis via NetRise, and SCA via BlackDuck, Sonatype Nexus IQ, and JFrog Xray — all containerized and pipeline-native for zero-friction adoption.</p>
+        <div class="exp-card-pills">
+          <span class="exp-pill">OWASP ZAP (DAST)</span><span class="exp-pill">42Crunch API Security</span><span class="exp-pill">NowSecure (Mobile)</span><span class="exp-pill">NetRise (Firmware)</span><span class="exp-pill">BlackDuck SCA</span><span class="exp-pill">JFrog Xray</span><span class="exp-pill">Sonatype Nexus IQ</span><span class="exp-pill">Frogbot OSS</span>
+        </div>
+      </div>
+
+      <div class="exp-card exp-cyan">
+        <div class="exp-card-glow"></div>
+        <div class="exp-card-header">
+          <span class="exp-card-num">03</span>
+          <span class="exp-card-title">Cloud Infrastructure — AWS, Azure &amp; GCP</span>
+        </div>
+        <p class="exp-card-desc">Hands-on delivery of complex cloud infrastructure across all three major hyperscalers. AWS: VPC architecture, Transit Gateway, PrivateLink, EKS, Lambda, CloudFormation, and the full security services suite. Azure: AKS, Azure DevOps, Key Vault, Monitor, Security Center. GCP: GKE, Cloud Monitoring, Vertex AI. Including federal project experience with elevated compliance, data sovereignty, and audit requirements.</p>
+        <div class="exp-card-pills">
+          <span class="exp-pill">AWS (Expert)</span><span class="exp-pill">Azure (Advanced)</span><span class="exp-pill">GCP (Advanced)</span><span class="exp-pill">Multi-Cloud IaC</span><span class="exp-pill">Federal Projects</span><span class="exp-pill">FedRAMP Concepts</span><span class="exp-pill">Zero Trust Networking</span><span class="exp-pill">Cloudflare Zero Trust</span>
+        </div>
+      </div>
+
+      <div class="exp-card exp-amber">
+        <div class="exp-card-glow"></div>
+        <div class="exp-card-header">
+          <span class="exp-card-num">04</span>
+          <span class="exp-card-title">Observability, AI Dashboards &amp; MLOps</span>
+        </div>
+        <p class="exp-card-desc">Building observability platforms that surface actionable insight from complex multi-cloud, multi-tool environments. Designed an AI-driven AppSec dashboard consolidating signals from 5+ scanning tools into a single stakeholder view. Extending DevOps pipelines into MLOps — automating model training, validation, and deployment. Implementing AI agent frameworks for intelligent pipeline orchestration and automated security remediation.</p>
+        <div class="exp-card-pills">
+          <span class="exp-pill">Prometheus + Grafana</span><span class="exp-pill">Datadog</span><span class="exp-pill">AI Security Dashboards</span><span class="exp-pill">MLOps Pipelines</span><span class="exp-pill">AI Agent Frameworks</span><span class="exp-pill">SageMaker</span><span class="exp-pill">Vertex AI</span><span class="exp-pill">Automated Remediation</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="container">
+    <div class="section-header reveal">
+      <p class="section-tag">04 — Work History</p>
+      <h2 class="section-title">Career <span class="accent">Timeline</span></h2>
+      <div class="section-divider"></div>
+    </div>
+    <div class="timeline">
+
+      <div class="timeline-item reveal" style="animation-delay:.1s">
+        <div class="timeline-dot"></div>
+        <div class="timeline-card">
+          <div class="timeline-header">
+            <span class="timeline-role">Sr. Cloud Security Architect &amp; DevSecOps Engineer</span>
+            <span class="timeline-date">May 2022 — Present</span>
+          </div>
+          <div class="timeline-company" style="color:var(--cyan);">Currently Works as Architect — Enterprise Scale</div>
+          <div class="timeline-location">📍 Phoenix, AZ</div>
+          <ul class="timeline-points">
+            <li>Architecting and securing enterprise-grade cloud-native systems across AWS, Azure, and GCP — including hands-on delivery of federal-grade projects with elevated compliance requirements (FedRAMP, NIST, CIS).</li>
+            <li>Integrated and customized security tools — Sysdig, 42Crunch, NowSecure, OWASP ZAP, BlackDuck, Fortify, JFrog, SonarQube — into CI/CD pipelines, enforcing automated security gates that block deployments on severity violations.</li>
+            <li>Kubernetes security hardening at scale: RBAC, Network Policies, Pod Security Standards, OPA/Gatekeeper, Kyverno admission policies, and CIS benchmark compliance across EKS, AKS, and GKE clusters.</li>
+            <li>Deployed Sysdig Secure agents across Kubernetes clusters for real-time runtime scanning — detecting shell access, privilege escalation, sensitive file access, and container drift as it happens.</li>
+            <li>Built a custom AI-driven AppSec dashboard aggregating scan signals from ZAP, 42Crunch, BlackDuck, Xray, and NowSecure — proposing enhancements to centralize and automate vulnerability review using AI-assisted triage.</li>
+            <li>Designed and implemented observability dashboards using Datadog, Prometheus, and Grafana — aggregating AWS and Sysdig security signals into real-time threat visibility panels for engineering leadership.</li>
+            <li>Implemented AI agent frameworks for intelligent pipeline orchestration, automated remediation workflows, and context-aware security response — extending DevOps pipelines into MLOps model deployment and validation workflows.</li>
+            <li>Architected secure AWS networking with VPC segmentation, Transit Gateway, PrivateLink, AWS Network Firewall, and Route 53 DNS Firewall, eliminating public exposure for all internal services.</li>
+            <li>Implemented Cloudflare Zero Trust (Access, Gateway, Tunnel, WARP) enabling identity-based private connectivity without inbound firewall exposure.</li>
+            <li>Designed multi-account AWS infrastructure using Terraform Sentinel — enforcing IAM least-privilege, KMS encryption for S3/EBS/RDS, and blocking all non-compliant infrastructure changes at plan/apply time.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="timeline-item reveal" style="animation-delay:.2s">
+        <div class="timeline-dot" style="background:linear-gradient(135deg,var(--pink),var(--amber));"></div>
+        <div class="timeline-card">
+          <div class="timeline-header">
+            <span class="timeline-role">Sr. DevSecOps & Cloud Engineer (Lead)</span>
+            <span class="timeline-date">Feb 2019 — May 2022</span>
+          </div>
+          <div class="timeline-company">TriWest Insurance</div>
+          <div class="timeline-location">📍 Phoenix, AZ</div>
+          <ul class="timeline-points">
+            <li>Orchestrated end-to-end CI/CD pipelines using Jenkins, achieving a 50% reduction in release time through build, test, and deployment automation.</li>
+            <li>Designed and maintained multi-cloud IaC using Terraform across AWS and Azure, with automated compliance auditing via AWS Config and Terraform Sentinel.</li>
+            <li>Integrated AWS security services — WAF, Shield, KMS, IAM, Inspector, GuardDuty, Secrets Manager — into a comprehensive cloud security posture.</li>
+            <li>Implemented end-to-end encryption at rest and in transit using AWS KMS, Azure Key Vault, and SSL/TLS across all cloud services.</li>
+            <li>Designed and implemented a multi-cloud security architecture for AWS and Azure, incorporating IAM policies, security groups, and network ACLs.</li>
+            <li>Developed CIS Level 1 and Level 2 benchmark profiles and integrated compliance drift detection into CI/CD pipelines.</li>
+            <li>Performed in-depth penetration testing on web applications and network infrastructure, providing detailed remediation strategies.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="timeline-item reveal" style="animation-delay:.3s">
+        <div class="timeline-dot" style="background:linear-gradient(135deg,var(--cyan),var(--indigo));"></div>
+        <div class="timeline-card">
+          <div class="timeline-header">
+            <span class="timeline-role">DevOps Engineer</span>
+            <span class="timeline-date">Jul 2018 — Jan 2019</span>
+          </div>
+          <div class="timeline-company">Deutsche Bank</div>
+          <div class="timeline-location">📍 Cary, NC</div>
+          <ul class="timeline-points">
+            <li>Designed and deployed highly available AWS architectures using EC2, RDS, and S3 with automated CloudFormation templates, reducing deployment times by 80% and cutting manual setup errors by 90%.</li>
+            <li>Developed a parallel deployment pipeline in Groovy, reducing deployment time by 50%.</li>
+            <li>Deployed and managed containerized applications on Red Hat OpenShift with RBAC, SCCs, and network policies for secure microservices operations.</li>
+            <li>Maintained Ansible for configuration management, automating server provisioning and enforcing IaC principles across RHEL environments.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="timeline-item reveal" style="animation-delay:.4s">
+        <div class="timeline-dot" style="background:linear-gradient(135deg,var(--amber),var(--cyan));"></div>
+        <div class="timeline-card">
+          <div class="timeline-header">
+            <span class="timeline-role">Cloud Engineer</span>
+            <span class="timeline-date">Nov 2017 — Jul 2018</span>
+          </div>
+          <div class="timeline-company">Optum</div>
+          <div class="timeline-location">📍 Eden Prairie, MN</div>
+          <ul class="timeline-points">
+            <li>Configured CloudWatch dashboards and alarms, achieving a 70% reduction in response times to performance issues and 60% decrease in mean time to resolution.</li>
+            <li>Managed configuration for over 900 servers using Chef, developing cookbooks, recipes, and data bags for automated provisioning.</li>
+            <li>Implemented CloudTrail across AWS accounts for detailed API activity tracking, improving security auditing and compliance; integrated logs for 50% improvement in threat detection.</li>
+            <li>Developed automated incident response workflows using CloudWatch Events and Lambda, reducing manual intervention by 65%.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="timeline-item reveal" style="animation-delay:.5s">
+        <div class="timeline-dot" style="background:linear-gradient(135deg,var(--pink),var(--indigo));"></div>
+        <div class="timeline-card">
+          <div class="timeline-header">
+            <span class="timeline-role">AWS Engineer</span>
+            <span class="timeline-date">Nov 2016 — May 2017</span>
+          </div>
+          <div class="timeline-company">Intelligrated</div>
+          <div class="timeline-location">📍 Mason, Ohio</div>
+          <ul class="timeline-points">
+            <li>Set up a new Ansible infrastructure to manage over 1,500 nodes and implemented Ansible Tower for AWS EC2 instances.</li>
+            <li>Developed Jenkins pipelines to execute Terraform templates for AWS infrastructure provisioning and environment management.</li>
+            <li>Configured Nagios to monitor EC2 Linux instances with Ansible deployment automation and managed VPC networking with Auto Scaling and security groups.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="timeline-item reveal" style="animation-delay:.6s">
+        <div class="timeline-dot" style="background:linear-gradient(135deg,var(--muted),var(--indigo));"></div>
+        <div class="timeline-card">
+          <div class="timeline-header">
+            <span class="timeline-role">Developer</span>
+            <span class="timeline-date">Jun 2014 — Dec 2015</span>
+          </div>
+          <div class="timeline-company">Bosch</div>
+          <div class="timeline-location">📍 Bangalore, India</div>
+          <ul class="timeline-points">
+            <li>Implemented Puppet modules for server housekeeping and actively participated in architecting the Puppet infrastructure across different environments.</li>
+            <li>Automated system administration tasks with Bash and PowerShell scripts, reducing manual workload and improving operational efficiency.</li>
+            <li>Collaborated on system upgrades and migrations, gathered requirements, performed firmware coding and testing, and provided client technical support.</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- CERTIFICATIONS -->
+<section id="certifications">
+  <div class="container">
+    <div class="section-header reveal">
+      <p class="section-tag">05 — Certifications</p>
+      <h2 class="section-title">Professional <span class="accent">Credentials</span></h2>
+      <div class="section-divider"></div>
+    </div>
+    <div class="certs-grid reveal">
+      <div class="cert-card">
+        <span class="cert-icon">☁️</span>
+        <div class="cert-name">AWS Certified Developer – Associate</div>
+        <div class="cert-issuer">Amazon Web Services</div>
+      </div>
+      <div class="cert-card">
+        <span class="cert-icon">🌐</span>
+        <div class="cert-name">GCP Cloud Certified – Cloud Developer</div>
+        <div class="cert-issuer">Google Cloud Platform</div>
+      </div>
+      <div class="cert-card">
+        <span class="cert-icon">🔐</span>
+        <div class="cert-name">CompTIA Security+ ce Certification</div>
+        <div class="cert-issuer">CompTIA</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EDUCATION -->
+<section id="education">
+  <div class="container">
+    <div class="section-header reveal">
+      <p class="section-tag">06 — Education</p>
+      <h2 class="section-title">Academic <span class="accent">Foundation</span></h2>
+      <div class="section-divider"></div>
+    </div>
+    <div class="edu-grid reveal">
+      <div class="edu-card">
+        <div class="edu-degree">Master of Science</div>
+        <div class="edu-degree" style="font-size:14px;color:var(--muted);font-weight:500;margin-bottom:10px;">Computer Information Systems</div>
+        <div class="edu-school">California University of Management and Science</div>
+        <div class="edu-meta">Mar 2016 — Sep 2017</div>
+        <div class="edu-gpa">⭐ GPA: 3.7</div>
+      </div>
+      <div class="edu-card">
+        <div class="edu-degree">Bachelor of Science</div>
+        <div class="edu-degree" style="font-size:14px;color:var(--muted);font-weight:500;margin-bottom:10px;">Electronics & Communication Engineering</div>
+        <div class="edu-school">JNTUK, India</div>
+        <div class="edu-meta">Sep 2010 — Apr 2014</div>
+        <div class="edu-gpa">⭐ GPA: 3.2</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="container">
+    <div class="section-header reveal">
+      <p class="section-tag">06 — Let's Connect</p>
+      <h2 class="section-title">Get In <span class="accent">Touch</span></h2>
+      <div class="section-divider"></div>
+    </div>
+    <div class="contact-inner reveal">
+      <p class="contact-tagline">
+        I'm currently open to <strong style="color:var(--white)">senior DevSecOps, cloud security, and platform engineering roles</strong>. Whether you have an opportunity, a question, or just want to say hello — my inbox is always open.
+      </p>
+      <div class="contact-links">
+        <a href="mailto:Krishna6devops@gmail.com" class="contact-link cl-email">
+          <span>✉️</span> Krishna6devops@gmail.com
+        </a>
+        <a href="tel:2405322388" class="contact-link cl-phone">
+          <span>📱</span> (240) 532-2388
+        </a>
+        <a href="https://linkedin.com" target="_blank" class="contact-link cl-linkedin">
+          <span>💼</span> LinkedIn Profile
+        </a>
+        <a href="https://github.com" target="_blank" class="contact-link cl-github">
+          <span>🐙</span> GitHub Profile
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>Designed &amp; built for <span>Krishna Pippala</span> — Senior DevSecOps Engineer · Phoenix, AZ · 2024</p>
+</footer>
+
+<script>
+/* ===== LOADER ===== */
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('loader').classList.add('fade-out');
+  }, 2200);
+});
+
+/* ===== CURSOR ===== */
+const dot = document.getElementById('cursor-dot');
+const ring = document.getElementById('cursor-ring');
+let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
+document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+function animCursor() {
+  ringX += (mouseX - ringX) * 0.12;
+  ringY += (mouseY - ringY) * 0.12;
+  dot.style.left = mouseX + 'px'; dot.style.top = mouseY + 'px';
+  ring.style.left = ringX + 'px'; ring.style.top = ringY + 'px';
+  requestAnimationFrame(animCursor);
+}
+animCursor();
+document.querySelectorAll('a,button,.skill-tag,.timeline-card,.about-card,.cert-card,.edu-card').forEach(el => {
+  el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+  el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+});
+
+/* ===== PARTICLE CANVAS ===== */
+const canvas = document.getElementById('particle-canvas');
+const ctx = canvas.getContext('2d');
+let W, H, particles = [];
+const COLORS = ['#6366f1','#f43f8a','#22d3ee','#fbbf24'];
+const NUM = 80;
+
+function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+resize(); window.addEventListener('resize', resize);
+
+class Particle {
+  constructor() { this.reset(); }
+  reset() {
+    this.x = Math.random() * W; this.y = Math.random() * H;
+    this.vx = (Math.random() - .5) * .5; this.vy = (Math.random() - .5) * .5;
+    this.r = Math.random() * 2 + 1;
+    this.color = COLORS[Math.floor(Math.random() * COLORS.length)];
+    this.alpha = Math.random() * .5 + .2;
+  }
+  update() {
+    this.x += this.vx; this.y += this.vy;
+    if (this.x < 0 || this.x > W) this.vx *= -1;
+    if (this.y < 0 || this.y > H) this.vy *= -1;
+  }
+  draw() {
+    ctx.beginPath(); ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.fillStyle = this.color; ctx.globalAlpha = this.alpha; ctx.fill(); ctx.globalAlpha = 1;
+  }
+}
+
+for (let i = 0; i < NUM; i++) particles.push(new Particle());
+
+function drawLines() {
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const dx = particles[i].x - particles[j].x;
+      const dy = particles[i].y - particles[j].y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 130) {
+        const alpha = (1 - dist / 130) * 0.25;
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        const grad = ctx.createLinearGradient(particles[i].x, particles[i].y, particles[j].x, particles[j].y);
+        grad.addColorStop(0, particles[i].color);
+        grad.addColorStop(1, particles[j].color);
+        ctx.strokeStyle = grad;
+        ctx.globalAlpha = alpha;
+        ctx.lineWidth = .7;
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
+    }
+  }
+}
+
+function animParticles() {
+  ctx.clearRect(0, 0, W, H);
+  particles.forEach(p => { p.update(); p.draw(); });
+  drawLines();
+  requestAnimationFrame(animParticles);
+}
+animParticles();
+
+/* ===== SCROLL REVEAL ===== */
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+}, { threshold: 0.12 });
+reveals.forEach(r => observer.observe(r));
+</script>
+</body>
+</html>
